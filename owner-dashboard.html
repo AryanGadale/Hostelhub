@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Owner Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background-color: var(--slate-50); }
+        .dashboard-container { max-width: var(--container-width); margin: 0 auto; padding: 7rem 1.5rem; }
+        .property-card { background: white; border: 1px solid var(--slate-200); border-radius: 1rem; padding: 1.5rem; display: flex; gap: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm); position: relative; }
+        .prop-img { width: 12rem; height: 9rem; border-radius: 0.5rem; object-fit: cover; background: var(--slate-100); }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
+        .stat-box { padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--slate-200); background: var(--slate-50); }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 2rem; border-radius: 1rem; width: 100%; max-width: 32rem; box-shadow: var(--shadow-2xl); }
+        
+        .edit-btn { position: absolute; top: 1.5rem; right: 1.5rem; background: var(--slate-100); padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; border: 1px solid var(--slate-200); color: var(--slate-600); font-weight: 600; display: flex; gap: 0.5rem; align-items: center; }
+        .edit-btn:hover { background: var(--blue-100); color: var(--blue-700); border-color: var(--blue-200); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="index.html" style="font-weight:700; display:flex; align-items:center; gap:0.5rem;">
+                <i data-lucide="arrow-left"></i> HostelHub Partner
+            </a>
+            <div style="display:flex; gap:1rem; align-items:center;">
+                <span id="ownerName">Owner</span>
+                <button onclick="logout()" class="btn-dark">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+            <h1 style="font-size:1.8rem; font-weight:700;">My Properties</h1>
+            <button class="btn-primary" onclick="openAddModal()"><i data-lucide="plus"></i> Add Property</button>
+        </div>
+        <div id="propertyList"><p>Loading...</p></div>
+    </div>
+
+    <div id="updateModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom:1rem;">Update Bed Availability</h2>
+            <input type="hidden" id="updatePropId">
+            <form id="updatePropertyForm">
+                <div id="dynamicRoomInputs"></div>
+                
+                <button type="submit" class="btn-primary" style="width:100%; margin-top:1.5rem;">Save Changes</button>
+                <button type="button" onclick="closeUpdateModal()" style="width:100%; margin-top:0.5rem; background:none; border:none; cursor:pointer;">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h2>Add New Property</h2>
+            <form id="addPropertyForm" style="margin-top:1rem;">
+                <input type="text" id="propName" class="form-input" placeholder="Hostel Name" required style="margin-bottom:1rem;">
+                <input type="text" id="propAddress" class="form-input" placeholder="Address" required style="margin-bottom:1rem;">
+                <div style="background:#f8fafc; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;">
+                    <div class="grid" style="grid-template-columns:1fr 1fr; gap:0.5rem;">
+                        <input type="text" id="name1" class="form-input" value="2 Sharing" placeholder="Name">
+                        <input type="number" id="bed1" class="form-input" value="10" placeholder="Beds">
+                        <input type="number" id="price1" class="form-input" value="6000" placeholder="Price">
+                    </div>
+                </div>
+                <div style="background:#f8fafc; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;">
+                    <div class="grid" style="grid-template-columns:1fr 1fr; gap:0.5rem;">
+                        <input type="text" id="name2" class="form-input" value="3 Sharing" placeholder="Name">
+                        <input type="number" id="bed2" class="form-input" value="15" placeholder="Beds">
+                        <input type="number" id="price2" class="form-input" value="4500" placeholder="Price">
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" style="width:100%;">Save Property</button>
+                <button type="button" onclick="closeAddModal()" style="width:100%; margin-top:0.5rem; background:none; border:none; cursor:pointer;">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="auth-check.js"></script>
+    <script>
+        lucide.createIcons();
+        const userStr = localStorage.getItem("user");
+        if(!userStr) window.location.href = "owner-login.html";
+        const user = JSON.parse(userStr);
+        document.getElementById("ownerName").innerText = user.name;
+
+        let globalProperties = [];
+
+        // LOAD PROPERTIES
+        async function loadProperties() {
+            try {
+                const res = await fetch(`http://localhost:5000/api/owner/properties/${user._id}`);
+                globalProperties = await res.json();
+                const container = document.getElementById("propertyList");
+                container.innerHTML = "";
+                
+                if(globalProperties.length === 0) { container.innerHTML = "<p>No properties found. Add one!</p>"; return; }
+
+                globalProperties.forEach(p => {
+                    let total = 0, avail = 0;
+                    p.roomTypes.forEach(r => { total += r.totalBeds; avail += r.availableBeds; });
+                    
+                    container.innerHTML += `
+                    <div class="property-card">
+                        <button class="edit-btn" onclick="openUpdateModal('${p._id}')">
+                            <i data-lucide="edit-2" style="width:1rem;"></i> Edit
+                        </button>
+                        <div style="flex:1;">
+                            <h3 style="font-size:1.25rem; font-weight:700;">${p.name}</h3>
+                            <p style="color:var(--slate-500);">${p.address}</p>
+                            <div class="stats-grid">
+                                <div class="stat-box" style="background:#eff6ff; border-color:#dbeafe;">
+                                    <span class="stat-label" style="color:#1d4ed8;">AVAILABLE</span>
+                                    <span class="stat-value" style="color:#1e3a8a;">${avail}</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-label">TOTAL</span>
+                                    <span class="stat-value">${total}</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-label">ID</span>
+                                    <span class="stat-value" style="font-size:0.75rem;">${p._id}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                lucide.createIcons();
+            } catch(e) { console.error(e); }
+        }
+        loadProperties();
+
+        // OPEN UPDATE MODAL
+        function openUpdateModal(id) {
+            const property = globalProperties.find(p => p._id === id);
+            document.getElementById("updatePropId").value = id;
+            const container = document.getElementById("dynamicRoomInputs");
+            container.innerHTML = "";
+
+            // Create inputs for EACH room type automatically
+            property.roomTypes.forEach((room, index) => {
+                container.innerHTML += `
+                    <div style="background:#f8fafc; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;">
+                        <label style="font-weight:700; display:block; margin-bottom:0.5rem;">${room.name}</label>
+                        <div class="grid" style="grid-template-columns:1fr 1fr; gap:1rem;">
+                            <div>
+                                <label style="font-size:0.75rem;">Available Beds</label>
+                                <input type="number" id="avail-${index}" class="form-input" value="${room.availableBeds}">
+                            </div>
+                            <div>
+                                <label style="font-size:0.75rem;">Price (₹)</label>
+                                <input type="number" id="price-${index}" class="form-input" value="${room.price}">
+                            </div>
+                        </div>
+                        <input type="hidden" id="name-${index}" value="${room.name}">
+                        <input type="hidden" id="total-${index}" value="${room.totalBeds}">
+                    </div>
+                `;
+            });
+            document.getElementById("updateModal").classList.add("active");
+        }
+
+        // SAVE UPDATE
+        document.getElementById("updatePropertyForm").addEventListener("submit", async(e) => {
+            e.preventDefault();
+            const id = document.getElementById("updatePropId").value;
+            const property = globalProperties.find(p => p._id === id);
+            
+            // Map inputs back to array
+            const updatedRoomTypes = property.roomTypes.map((_, index) => ({
+                name: document.getElementById(`name-${index}`).value,
+                price: parseInt(document.getElementById(`price-${index}`).value),
+                availableBeds: parseInt(document.getElementById(`avail-${index}`).value),
+                totalBeds: parseInt(document.getElementById(`total-${index}`).value)
+            }));
+
+            // Send PUT Request
+            await fetch(`http://localhost:5000/api/properties/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ roomTypes: updatedRoomTypes })
+            });
+            
+            closeUpdateModal();
+            loadProperties(); // Refresh UI instantly
+        });
+
+        // ADD NEW PROPERTY
+        document.getElementById("addPropertyForm").addEventListener("submit", async(e) => {
+            e.preventDefault();
+            const body = {
+                ownerId: user._id,
+                name: document.getElementById("propName").value,
+                address: document.getElementById("propAddress").value,
+                roomTypes: [
+                    { name: document.getElementById("name1").value, totalBeds: parseInt(document.getElementById("bed1").value), availableBeds: parseInt(document.getElementById("bed1").value), price: parseInt(document.getElementById("price1").value) },
+                    { name: document.getElementById("name2").value, totalBeds: parseInt(document.getElementById("bed2").value), availableBeds: parseInt(document.getElementById("bed2").value), price: parseInt(document.getElementById("price2").value) }
+                ]
+            };
+            await fetch("http://localhost:5000/api/properties", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+            closeAddModal();
+            loadProperties();
+        });
+
+        function closeUpdateModal() { document.getElementById("updateModal").classList.remove("active"); }
+        function openAddModal() { document.getElementById("addModal").classList.add("active"); }
+        function closeAddModal() { document.getElementById("addModal").classList.remove("active"); }
+        function logout() { localStorage.removeItem("user"); window.location.href="index.html"; }
+    </script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HostelHub - Premium Student Living</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #06b6d4;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent-glow: rgba(79, 70, 229, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        body { background-color: var(--background); color: var(--text-main); overflow-x: hidden; }
+
+        /* Animated Background Blobs */
+        .blob-cont { position: fixed; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; top: 0; left: 0; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: float 10s infinite alternate; }
+        .blob-1 { width: 500px; height: 500px; background: #e0e7ff; top: -10%; left: -10%; animation-delay: 0s; }
+        .blob-2 { width: 400px; height: 400px; background: #cffafe; bottom: -10%; right: -5%; animation-delay: 2s; }
+        .blob-3 { width: 300px; height: 300px; background: #fae8ff; top: 40%; left: 40%; animation-delay: 4s; }
+
+        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
+
+        /* Navbar */
+        .navbar { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.5); transition: 0.3s; padding: 1rem 0; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; }
+        
+        .logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+        .logo-icon { width: 2.5rem; height: 2.5rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
+        .logo-text { font-size: 1.25rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.03em; }
+        .logo-sub { font-size: 0.65rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em; }
+
+        .nav-links { display: flex; align-items: center; gap: 2rem; }
+        .nav-link { font-weight: 600; color: var(--text-muted); text-decoration: none; transition: 0.2s; font-size: 0.95rem; }
+        .nav-link:hover { color: var(--primary); }
+        
+        .btn-login { background: var(--text-main); color: white; padding: 0.6rem 1.4rem; border-radius: 99px; text-decoration: none; font-weight: 600; transition: 0.3s; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3); background: black; }
+
+        /* Hero Section */
+        .hero { padding-top: 10rem; padding-bottom: 6rem; position: relative; }
+        .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+        
+        .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.8); border: 1px solid #e2e8f0; border-radius: 99px; margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); backdrop-filter: blur(4px); }
+        .hero-badge-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 0 2px #dcfce7; animation: pulse 2s infinite; }
+        
+        .hero-title { font-size: 4rem; line-height: 1.1; font-weight: 800; color: var(--text-main); margin-bottom: 1.5rem; letter-spacing: -0.04em; }
+        .text-gradient { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .hero-desc { font-size: 1.125rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 2.5rem; max-width: 90%; }
+        
+        .btn-hero { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 1rem 2rem; border-radius: 99px; font-size: 1.1rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.3s; box-shadow: 0 10px 25px -5px var(--accent-glow); }
+        .btn-hero:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 20px 30px -10px var(--accent-glow); }
+
+        /* 3D Image Card */
+        .hero-image-wrapper { position: relative; perspective: 1000px; }
+        .hero-card { 
+            position: relative; border-radius: 2rem; overflow: hidden; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 8px solid rgba(255,255,255,0.5);
+            transform-style: preserve-3d; transition: transform 0.5s ease-out;
+            animation: heroFloat 6s ease-in-out infinite;
+        }
+        .hero-card img { width: 100%; height: 500px; object-fit: cover; display: block; }
+        
+        @keyframes heroFloat { 0%, 100% { transform: translateY(0) rotateY(-5deg); } 50% { transform: translateY(-20px) rotateY(0deg); } }
+
+        .trust-badge {
+            position: absolute; bottom: 2rem; left: -2rem; background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 1.5rem; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: flex; align-items: center; gap: 1rem; animation: floatBadge 5s infinite reverse;
+            border: 1px solid white; z-index: 10;
+        }
+        @keyframes floatBadge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
+
+        /* Listings Section */
+        .section-title { font-size: 2.5rem; font-weight: 800; text-align: center; margin-bottom: 1rem; }
+        .section-subtitle { text-align: center; color: var(--text-muted); margin-bottom: 4rem; font-size: 1.1rem; }
+
+        .listings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; padding: 2rem 0; }
+
+        .card {
+            background: white; border-radius: 1.5rem; overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; cursor: pointer;
+        }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); border-color: var(--primary); }
+        
+        .card-img-box { height: 220px; overflow: hidden; position: relative; }
+        .card-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .card:hover .card-img-box img { transform: scale(1.1); }
+        
+        .card-tag { position: absolute; top: 1rem; right: 1rem; padding: 0.35rem 0.85rem; border-radius: 99px; font-size: 0.75rem; font-weight: 800; background: rgba(255,255,255,0.95); backdrop-filter: blur(4px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 0.3rem; }
+        
+        .card-content { padding: 1.75rem; }
+        .card-title { font-size: 1.35rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main); }
+        .card-loc { font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 1.5rem; }
+        
+        .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid #f1f5f9; }
+        .price { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
+        .price span { font-size: 0.85rem; font-weight: 500; color: var(--text-muted); }
+        
+        .btn-arrow { width: 3rem; height: 3rem; border-radius: 50%; background: var(--text-main); color: white; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .card:hover .btn-arrow { background: var(--primary); transform: rotate(-45deg); }
+
+        /* Footer */
+        footer { background: #0f172a; color: #94a3b8; padding: 5rem 0 2rem; position: relative; overflow: hidden; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 4rem; margin-bottom: 4rem; }
+        .footer-logo { color: white; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+        .footer-links h4 { color: white; margin-bottom: 1.5rem; font-size: 1rem; }
+        .footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+        .footer-links a { color: inherit; text-decoration: none; transition: 0.2s; }
+        .footer-links a:hover { color: white; }
+
+        /* Animation Classes */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 900px) {
+            .hero-grid { grid-template-columns: 1fr; text-align: center; }
+            .hero-desc { margin: 0 auto 2rem auto; }
+            .hero-image-wrapper { display: none; }
+            .nav-links { display: none; }
+            .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="blob-cont">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">H</div>
+                <div>
+                    <div class="logo-text">HostelHub</div>
+                    <div class="logo-sub">Pune Edition</div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="#listings" class="nav-link">Browse</a>
+                <a href="owner-login.html" class="nav-link">Partner Login</a>
+                <a href="student-login.html" class="btn-login">Student Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero container">
+        <div class="hero-grid">
+            <div class="reveal">
+                <div class="hero-badge">
+                    <div class="hero-badge-dot"></div>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Live near VIT Pune</span>
+                </div>
+                <h1 class="hero-title">
+                    Find your <br/>
+                    <span class="text-gradient">dream student home</span>
+                </h1>
+                <p class="hero-desc">
+                    Discover premium hostels with zero brokerage. Verified owners, transparent pricing, and a community that feels like home.
+                </p>
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <a href="#listings" class="btn-hero">Explore Hostels <i data-lucide="arrow-right"></i></a>
+                    <div style="display: flex; gap: 2rem; margin-left: 1rem; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
+                        <span style="display: flex; align-items: center; gap: 0.4rem;"><i data-lucide="shield-check" style="color:var(--primary); width:1.1rem;"></i> Verified</span>
+                        <span style="display: flex; align-items: center; gap: 0.4rem;"><i data-lucide="zap" style="color:var(--secondary); width:1.1rem;"></i> Fast</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-image-wrapper reveal delay-2">
+                <div class="hero-card" id="heroCard">
+                    <img src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1000&q=80" alt="Hostel">
+                    <div class="trust-badge">
+                        <div style="background: #dcfce7; padding: 0.8rem; border-radius: 50%;">
+                            <i data-lucide="users" style="color: #16a34a;"></i>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Trusted By</p>
+                            <p style="font-size: 1.1rem; font-weight: 800; color: #0f172a;">2,000+ Students</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="listings" style="padding: 4rem 0;">
+        <div class="container">
+            <div class="reveal">
+                <h2 class="section-title">Popular Listings</h2>
+                <p class="section-subtitle">Top-rated stays handpicked for comfort & convenience.</p>
+            </div>
+
+            <div class="listings-grid">
+                
+                <div class="card reveal" onclick="window.location.href='orchid-details.html'">
+                    <div class="card-img-box">
+                        <img src="orchid.jpeg" alt="Orchid">
+                        <div class="card-tag" style="color: var(--primary);">
+                            <i data-lucide="crown" style="width: 0.8rem;"></i> PREMIUM
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Orchid House</h3>
+                        <p class="card-loc"><i data-lucide="map-pin" style="width: 0.9rem;"></i> Ambegaon Budruk</p>
+                        <div class="card-footer">
+                            <div class="price">₹9,500<span>/mo</span></div>
+                            <div class="btn-arrow"><i data-lucide="arrow-right"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card reveal" onclick="window.location.href='sharada-details.html'">
+                    <div class="card-img-box">
+                        <img src="Sharada.jpeg" alt="Sharada">
+                        <div class="card-tag" style="color: #0f172a;">
+                            <i data-lucide="map" style="width: 0.8rem;"></i> NEAR VIT
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Sharada Hostels</h3>
+                        <p class="card-loc"><i data-lucide="map-pin" style="width: 0.9rem;"></i> Bibwewadi</p>
+                        <div class="card-footer">
+                            <div class="price">₹6,500<span>/mo</span></div>
+                            <div class="btn-arrow"><i data-lucide="arrow-right"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card reveal" onclick="window.location.href='greenleaf-details.html'">
+                    <div class="card-img-box">
+                        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=500" alt="GreenLeaf">
+                        <div class="card-tag" style="color: #16a34a;">
+                            <i data-lucide="leaf" style="width: 0.8rem;"></i> ECO
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">GreenLeaf Living</h3>
+                        <p class="card-loc"><i data-lucide="map-pin" style="width: 0.9rem;"></i> Upper Indira Nagar</p>
+                        <div class="card-footer">
+                            <div class="price">₹7,500<span>/mo</span></div>
+                            <div class="btn-arrow"><i data-lucide="arrow-right"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card reveal" onclick="window.location.href='samarth-details.html'">
+                    <div class="card-img-box">
+                        <img src="samarth 3.jpeg" alt="Samarth" style="object-position: center;">
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Samarth Hostel</h3>
+                        <p class="card-loc"><i data-lucide="map-pin" style="width: 0.9rem;"></i> Bibwewadi</p>
+                        <div class="card-footer">
+                            <div class="price">₹4,500<span>/mo</span></div>
+                            <div class="btn-arrow"><i data-lucide="arrow-right"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card reveal" onclick="window.location.href='aashirwad-details.html'">
+                    <div class="card-img-box">
+                        <img src="aashirwad.jpeg" alt="Aashirwad">
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Aashirwad Hostel</h3>
+                        <p class="card-loc"><i data-lucide="map-pin" style="width: 0.9rem;"></i> Near City College</p>
+                        <div class="card-footer">
+                            <div class="price">₹4,500<span>/mo</span></div>
+                            <div class="btn-arrow"><i data-lucide="arrow-right"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <a href="#" class="footer-logo">
+                        <div style="width:2rem; height:2rem; background:var(--primary); border-radius:0.5rem; display:flex; align-items:center; justify-content:center;">H</div>
+                        HostelHub
+                    </a>
+                    <p style="line-height: 1.6; max-width: 300px;">
+                        Simplifying student accommodation in Pune. We connect students with verified owners directly.
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="samarth-details.html">Samarth Hostel</a></li>
+                        <li><a href="greenleaf-details.html">GreenLeaf Living</a></li>
+                        <li><a href="orchid-details.html">Orchid House</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Account</h4>
+                    <ul>
+                        <li><a href="owner-login.html">Partner Login</a></li>
+                        <li><a href="student-login.html">Student Login</a></li>
+                        <li><a href="student-signup.html">Create Account</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="text-align: center; font-size: 0.875rem; border-top: 1px solid #1e293b; padding-top: 2rem;">
+                &copy; 2026 HostelHub Pune. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // 3D Tilt Effect for Hero Image
+        const card = document.getElementById('heroCard');
+        document.addEventListener('mousemove', (e) => {
+            if(window.innerWidth > 900) {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            }
+        });
+
+        // Scroll Reveal Animation
+        const revealElements = document.querySelectorAll('.reveal');
+        const scrollReveal = () => {
+            revealElements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                if (elementTop < window.innerHeight - 100) {
+                    element.classList.add('active');
+                }
+            });
+        }
+        window.addEventListener('scroll', scrollReveal);
+        scrollReveal(); // Trigger once on load
+    </script>
+</body>
+</html>

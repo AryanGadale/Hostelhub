@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Login</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="auth-body owner">
+
+    <div class="auth-card">
+        <div class="auth-header owner">
+            <a href="index.html" style="position: absolute; top: 1rem; right: 1rem; color: rgba(255,255,255,0.8);">
+                <i data-lucide="x"></i>
+            </a>
+            <div style="width: 4rem; height: 4rem; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto;">
+                <i data-lucide="briefcase" style="width: 2rem; height: 2rem; color: white;"></i>
+            </div>
+            <h3 style="font-size: 1.5rem; font-weight: 700; color: white;">Partner Login</h3>
+            <p style="color: rgba(255,255,255,0.8); font-size: 0.875rem; margin-top: 0.5rem;">Manage properties & bookings</p>
+        </div>
+
+        <div style="padding: 2rem;">
+            <form id="ownerLoginForm">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-input" required placeholder="owner@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="password" class="form-input" required placeholder="******">
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1.5rem; background-color: var(--slate-800); border-color: var(--slate-900);">
+                    Access Dashboard
+                </button>
+            </form>
+            <div style="margin-top: 1.5rem; text-align: center;">
+                <a href="index.html" style="color: var(--slate-500); text-decoration: none; font-size: 0.875rem;">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        document.getElementById("ownerLoginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                const res = await fetch("http://localhost:5000/api/auth/owner/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem("user", JSON.stringify(data));
+                    window.location.href = "owner-dashboard.html";
+                } else {
+                    alert("Login Failed: " + (data.error || "Invalid credentials"));
+                }
+            } catch (err) {
+                alert("Could not connect to server.");
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - HostelHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --background: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--background); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+
+        /* Animated Background */
+        .blob-cont { position: fixed; width: 100vw; height: 100vh; z-index: -1; top: 0; left: 0; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: float 10s infinite alternate; }
+        .blob-1 { width: 400px; height: 400px; background: #e0e7ff; top: -10%; left: -10%; }
+        .blob-2 { width: 300px; height: 300px; background: #fae8ff; bottom: -10%; right: -5%; animation-delay: 2s; }
+        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
+
+        /* Navbar */
+        .navbar { position: fixed; top: 0; width: 100%; z-index: 50; background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.5); padding: 1rem 0; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 1.5rem; }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; }
+
+        .page-header { padding-top: 8rem; padding-bottom: 3rem; text-align: center; }
+        .page-title { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--primary), #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* Booking Cards */
+        .bookings-grid { display: grid; gap: 1.5rem; padding-bottom: 4rem; }
+
+        .booking-card {
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 1.5rem; padding: 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            animation: slideUp 0.5s ease-out forwards; opacity: 0; transform: translateY(20px);
+        }
+        .booking-card:nth-child(1) { animation-delay: 0.1s; }
+        .booking-card:nth-child(2) { animation-delay: 0.2s; }
+        .booking-card:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+
+        .booking-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border-color: var(--primary); }
+
+        .hostel-name { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem; }
+        .booking-details { display: flex; gap: 1.5rem; color: var(--text-muted); font-size: 0.95rem; }
+        .detail-item { display: flex; align-items: center; gap: 0.4rem; }
+
+        .status-badge {
+            padding: 0.5rem 1rem; border-radius: 99px; font-weight: 700; font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .status-confirmed { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .status-pending { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none;
+            padding: 0.5rem 1rem; border-radius: 0.75rem; font-weight: 600;
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .logout-btn:hover { background: #ef4444; color: white; }
+
+        @media (max-width: 768px) {
+            .booking-card { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+            .status-badge { align-self: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="blob-cont">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="index.html" style="text-decoration:none; color:inherit; font-weight:700; display:flex; align-items:center; gap:0.5rem;">
+                <div style="background:var(--primary); color:white; width:2rem; height:2rem; border-radius:0.5rem; display:flex; align-items:center; justify-content:center;">H</div>
+                HostelHub
+            </a>
+            <button onclick="logout()" class="logout-btn">
+                <i data-lucide="log-out" style="width: 1rem;"></i> Logout
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Your Bookings</h1>
+            <p style="color: var(--text-muted); font-size: 1.1rem;">Track the status of your hostel applications.</p>
+        </div>
+
+        <div id="bookingsList" class="bookings-grid">
+            <div style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                <i data-lucide="loader-2" style="animation: spin 1s linear infinite;"></i> Loading...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function loadBookings() {
+            const userStr = localStorage.getItem("user");
+            
+            // 1. Auth Check
+            if (!userStr) {
+                window.location.href = "access-denied.html"; 
+                return;
+            }
+
+            const user = JSON.parse(userStr);
+            
+            try {
+                // 2. Fetch Data (Using localhost to match your OG files)
+                const res = await fetch(`http://localhost:5000/api/bookings/student/${user._id}`);
+                const bookings = await res.json();
+                
+                const container = document.getElementById("bookingsList");
+                container.innerHTML = "";
+
+                if (bookings.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align:center; padding: 4rem; background:rgba(255,255,255,0.5); border-radius:1.5rem;">
+                            <i data-lucide="calendar-x" style="width:4rem; height:4rem; color:#cbd5e1; margin-bottom:1rem;"></i>
+                            <h3 style="font-size:1.5rem; font-weight:700; margin-bottom:0.5rem; color:var(--text-main);">No bookings yet</h3>
+                            <p style="color:var(--text-muted); margin-bottom:1.5rem;">You haven't applied to any hostels yet.</p>
+                            <a href="index.html#listings" style="background:var(--primary); color:white; padding:0.8rem 1.5rem; border-radius:99px; text-decoration:none; font-weight:600;">Browse Hostels</a>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+
+                bookings.forEach(b => {
+                    const date = new Date(b.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                    container.innerHTML += `
+                        <div class="booking-card">
+                            <div>
+                                <h3 class="hostel-name">${b.hostelName}</h3>
+                                <div class="booking-details">
+                                    <span class="detail-item"><i data-lucide="bed-double" style="width:1rem;"></i> ${b.roomType}</span>
+                                    <span class="detail-item"><i data-lucide="indian-rupee" style="width:1rem;"></i> ${b.price}/mo</span>
+                                    <span class="detail-item"><i data-lucide="calendar" style="width:1rem;"></i> ${date}</span>
+                                </div>
+                            </div>
+                            <span class="status-badge ${b.status === 'confirmed' ? 'status-confirmed' : 'status-pending'}">
+                                ${b.status || 'PENDING'}
+                            </span>
+                        </div>
+                    `;
+                });
+                lucide.createIcons();
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById("bookingsList").innerHTML = `
+                    <div style="text-align:center; color:#ef4444; padding:2rem;">
+                        <p>Error connecting to server. Is <b>node server.js</b> running?</p>
+                    </div>
+                `;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("user");
+            window.location.href = "index.html";
+        }
+
+        loadBookings();
+    </script>
+</body>
+</html>

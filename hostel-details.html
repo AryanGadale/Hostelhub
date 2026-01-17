@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saiashray Student Housing - Details</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body style="background-color: white;">
+
+    <nav style="background: white; border-bottom: 1px solid var(--slate-200); padding: 1rem 0; position: sticky; top: 0; z-index: 50;">
+        <div class="container flex justify-between items-center">
+            <a href="index.html" style="display: flex; align-items: center; gap: 0.5rem; color: var(--slate-600); font-weight: 500;">
+                <i data-lucide="arrow-left" style="width: 1.25rem; height: 1.25rem;"></i> Back
+            </a>
+            <span style="font-weight: 700; font-size: 1.25rem;">HostelHub</span>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 0; padding-top: 0; max-width: 100%; padding-left: 0; padding-right: 0;">
+        <div class="details-hero">
+            <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80">
+            <div class="details-overlay"></div>
+            <div style="position: absolute; bottom: 0; left: 0; padding: 2rem; width: 100%; color: white;">
+                <div class="container">
+                    <h1 style="font-size: 2.25rem; font-weight: 700; margin-bottom: 0.5rem;">Saiashray Student Housing</h1>
+                    <p style="display: flex; align-items: center; gap: 0.5rem; color: var(--slate-200);"><i data-lucide="map-pin" style="width: 1.25rem; height: 1.25rem; color: var(--blue-500);"></i> Upper Indira Nagar, Bibwewadi</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" style="padding: 2rem 1.5rem; max-width: var(--container-width); margin: 0 auto;">
+            <div class="grid lg:grid-cols-3 gap-8">
+                
+                <div class="lg:col-span-2" style="display: flex; flex-direction: column; gap: 2rem;">
+                    <section>
+                        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--slate-900); margin-bottom: 0.75rem;">About</h3>
+                        <p style="color: var(--slate-600); line-height: 1.625;">A premium student housing facility located just walking distance from the campus. We focus on providing a quiet environment for engineering students with nutritious home-made food.</p>
+                    </section>
+
+                    <section>
+                        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--slate-900); margin-bottom: 1rem;">Amenities</h3>
+                        <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: var(--slate-50); border-radius: 0.5rem; border: 1px solid var(--slate-200);">
+                                <i data-lucide="wifi" style="color: var(--blue-600); width: 1.25rem; height: 1.25rem;"></i> WiFi
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: var(--slate-50); border-radius: 0.5rem; border: 1px solid var(--slate-200);">
+                                <i data-lucide="coffee" style="color: var(--blue-600); width: 1.25rem; height: 1.25rem;"></i> Mess
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="lg:col-span-1">
+                    <div style="position: sticky; top: 6rem; display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div class="booking-card">
+                            <div class="flex justify-between items-center" style="margin-bottom: 1rem;">
+                                <span style="color: var(--slate-600); font-weight: 500;">Status</span>
+                                <span style="background: var(--green-600); color: white; font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 700; text-transform: uppercase;">Open</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
+                                <div class="flex justify-between">
+                                    <span style="color: var(--slate-500); font-size: 0.875rem;">Available</span>
+                                    <span style="font-weight: 700; color: var(--blue-600);">3 Beds</span>
+                                </div>
+                            </div>
+                            <button onclick="alert('Booking Confirmed!')" class="btn-primary" style="width: 100%;">Book Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </div>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
